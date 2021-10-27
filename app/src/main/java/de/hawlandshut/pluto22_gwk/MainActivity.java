@@ -51,4 +51,10 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG,"called onDestroy");
     }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Log.d(TAG,"called onResume");
+    }
 }
