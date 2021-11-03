@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">pluto22_gwk</string>
     <string name="str_hello_sonne">Hello Sonne!</string>
+    <string name="post1">Post1.</string>
+    <string name="post2">Post2</string>
+    <string name="test">Test</string>
 </resources>
