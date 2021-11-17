@@ -15,6 +15,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity {
 
     static final String TAG = "xx MainActivity";
@@ -25,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // TODO: just for testing, remove later
-        Toast.makeText( getApplicationContext(), "Ein erster Toast", Toast.LENGTH_LONG).show();
         Log.d(TAG, "called onCreate");
     }
 
@@ -33,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "called onStart");
-        // TODO: nur zum Testen von SignIn - muss wieder raus
-        // gehe direkt zu signIn
-        Intent intent = new Intent( getApplication(), SignInActivity.class);
-        startActivity( intent );
+        FirebaseUser user;
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            // Kein User angemeldet
+            Toast.makeText( getApplicationContext(), "Kein User angemeldet. Gehe zu SignIn!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent( getApplication(), SignInActivity.class);
+            startActivity( intent );
+        }
     }
 
     @Override

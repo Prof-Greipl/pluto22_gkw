@@ -9,41 +9,37 @@
     android:layout_marginRight="10dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    tools:context=".SignInActivity">
-
-    <EditText
-        android:id="@+id/signInEditTextEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="E-Mail (will not be public)"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/signInEditTextPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:ems="10"
-        android:inputType="textPassword" />
-
-    <Button
-        android:id="@+id/signInButtonSignIn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SignIn" />
-
-    <Button
-        android:id="@+id/signInButtonResetPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Reset Password" />
+    tools:context=".ManageAccountActivity">
 
     <TextView
-        android:id="@+id/signInTextView"
+        android:id="@+id/manageAccountTextViewEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Please enter you e-mail adress and click to receive an e-mail to reset the password" />
+        android:text="You should never see this." />
+
+    <TextView
+        android:id="@+id/manageAccountTextViewAccountVerified"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You should never see this." />
+
+    <TextView
+        android:id="@+id/manageAccountTextViewId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You should never see this." />
+
+    <Button
+        android:id="@+id/manageAccountButtonSignOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign Out" />
+
+    <Button
+        android:id="@+id/manageAccountButtonSendActivationMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Activation Mail" />
 
     <Space
         android:layout_width="1dp"
@@ -51,10 +47,25 @@
         android:layout_weight="1"
         ></Space>
 
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="For security reasons please enter your password to delete the account. Deletion cannot be undone." />
+
+    <EditText
+        android:id="@+id/manageAccountEditTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword" />
+
     <Button
-        android:id="@+id/signInButtonCreateAccount"
+        android:id="@+id/manageAccountButtonDeleteAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#F4511E"
-        android:text="Create new account" />
+        android:text="Delete Account" />
+
 </LinearLayout>
