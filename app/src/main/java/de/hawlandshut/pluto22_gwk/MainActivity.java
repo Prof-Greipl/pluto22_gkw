@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         if (user == null){
             // Kein User angemeldet
             Toast.makeText( getApplicationContext(), "Kein User angemeldet. Gehe zu SignIn!", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent( getApplication(), SignInActivity.class);
+            Intent intent = new Intent( getApplication(), PostActivity.class);
             startActivity( intent );
         }
     }
