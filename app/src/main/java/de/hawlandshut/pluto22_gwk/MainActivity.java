@@ -28,8 +28,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hawlandshut.pluto22_gwk.model.Post;
 import de.hawlandshut.pluto22_gwk.testdata.PostTestData;
@@ -118,8 +123,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity( intent );
                 return true;
 
+            case R.id.menu_main_test_write:
+                DatabaseReference db = FirebaseDatabase.getInstance().getReference("Posts/");
 
-
+                Map<String, Object> test = new HashMap<>();
+                test.put("uid", "test_uid");
+                test.put("name", "Hans Huber");
+                test.put("matnr", "123456");
+                test.put("timestamp", ServerValue.TIMESTAMP);
+                db.push().setValue( test );
 
             default:
                 return true;
@@ -147,172 +159,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         });
-    }
-
-    private void doDeleteTestUser() {
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            Toast.makeText( getApplicationContext(), "Deletion not possible (No user signed in).", Toast.LENGTH_LONG).show();
-        }
-        else {
-
-            // Reauthenticate
-            String email = TEST_MAIL;
-            String password = TEST_PASSWORD;
-
-            AuthCredential credential = EmailAuthProvider.getCredential( email, password);
-            user.reauthenticate( credential )
-                    .addOnCompleteListener(
-                            this,
-                            new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        //Erfolgsfall
-                                        Toast.makeText( getApplicationContext(), "Reauth is fine.", Toast.LENGTH_LONG).show();
-                                        finalDeletion();
-                                    } else {
-                                        // Fehlerfall
-                                        Toast.makeText( getApplicationContext(), "Reauth failed", Toast.LENGTH_LONG).show();
-                                        Log.d(TAG, "Reauth failed : " +  task.getException().getMessage());
-                                    }
-                                }
-                            }
-                    );
-        }
-    }
-
-    private void finalDeletion(){
-
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            Log.e(TAG, "Serious error: Null user in final Deletion");
-        } else {
-            user.delete()
-                    .addOnCompleteListener(
-                            this,
-                            new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        //Erfolgsfall
-                                        Toast.makeText(getApplicationContext(), "Account deleted.", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        // Fehlerfall
-                                        Toast.makeText(getApplicationContext(), "Deletion failed", Toast.LENGTH_LONG).show();
-                                        Log.d(TAG, "Delete Account Error :" + task.getException().getMessage());
-                                    }
-                                }
-                            }
-                    );
-        }
-
-    }
-
-    private void doTestAuthStatus() {
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            Toast.makeText( getApplicationContext(), "No user signed in.", Toast.LENGTH_LONG).show();
-        }
-        else {
-            Toast.makeText( getApplicationContext(), "User: "
-                    + user.getEmail()
-                    + "(V = "
-                    + user.isEmailVerified()
-                    +")", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void doSignIn() {
-        String email = TEST_MAIL;
-        String password = TEST_PASSWORD;
-
-        // Check, if any user is signed in. If yes, go home...
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null){
-            Toast.makeText( getApplicationContext(), "Please sign out first.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        FirebaseAuth.getInstance().signInWithEmailAndPassword( email, password)
-                .addOnCompleteListener(
-                        this,
-                        new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()){
-                                    //Erfolgsfall
-                                    Toast.makeText( getApplicationContext(), "You are signed in.", Toast.LENGTH_LONG).show();
-                                } else {
-                                    // Fehlerfall
-                                    Toast.makeText( getApplicationContext(), "Sign in failed", Toast.LENGTH_LONG).show();
-                                    Log.d(TAG, "Create Account Error :" +  task.getException().getMessage());
-                                }
-                            }
-                        }
-                );
-    }
-
-    private void doSignOut() {
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            Toast.makeText( getApplicationContext(), "Sorry, no user was signed in.", Toast.LENGTH_LONG).show();
-        } else {
-            FirebaseAuth.getInstance().signOut();
-            Toast.makeText( getApplicationContext(), user.getEmail() + " signed out!.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void doSendActivationMail() {
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            Toast.makeText( getApplicationContext(), "Sending not possible (No user signed in).", Toast.LENGTH_LONG).show();
-        }
-        else {
-            user.sendEmailVerification()
-                .addOnCompleteListener(
-                        this,
-                        new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    //Erfolgsfall
-                                    Toast.makeText( getApplicationContext(), "Ver. Mail sent.", Toast.LENGTH_LONG).show();
-                                } else {
-                                    // Fehlerfall
-                                    Toast.makeText( getApplicationContext(), "Sending Verif. Mail Failed", Toast.LENGTH_LONG).show();
-                                    Log.d(TAG, "Sending verification mail failed : " +  task.getException().getMessage());
-                                }
-                            }
-                        }
-                );
-        }
-    }
-
-    private void doSendResetPasswordMail() {
-        // TODO: Check E-Mail...
-        FirebaseAuth.getInstance().sendPasswordResetEmail( TEST_MAIL )
-                .addOnCompleteListener(
-                    this,
-                    new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                //Erfolgsfall
-                                Toast.makeText( getApplicationContext(), "PW-Reset Mail sent.", Toast.LENGTH_LONG).show();
-                            } else {
-                                // Fehlerfall
-                                Toast.makeText( getApplicationContext(), "Sending PW-Reset Mail Failed", Toast.LENGTH_LONG).show();
-                                Log.d(TAG, "Sending password reset mail failed : " +  task.getException().getMessage());
-                            }
-                        }
-                    }
-            );
     }
 
 
