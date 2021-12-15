@@ -23,7 +23,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -95,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null){
             // Kein User angemeldet
-            Toast.makeText( getApplicationContext(), "Kein User angemeldet. Gehe zu SignIn!", Toast.LENGTH_LONG).show();
-         //   Intent intent = new Intent( getApplication(), PostActivity.class);
-         //   startActivity( intent );
+            // Toast.makeText( getApplicationContext(), "Kein User angemeldet. Gehe zu SignIn!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent( getApplication(), SignInActivity.class);
+            startActivity( intent );
         }
     }
 
@@ -111,33 +113,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch ( item.getItemId()) {
-            case R.id.menu_main_create_test_user:
-                doCreateTestUser();
+            case R.id.menu_main_manage_account:
+                Intent intent = new Intent( getApplication(), ManageAccountActivity.class);
+                startActivity( intent );
                 return true;
 
-            case R.id.menu_main_delete_test_user:
-                doDeleteTestUser();
-                return true;
 
-            case R.id.menu_main_test_auth_status:
-                doTestAuthStatus();
-                return true;
-
-            case R.id.menu_main_sign_in:
-                doSignIn();
-                return true;
-
-            case R.id.menu_main_sign_out:
-                doSignOut();
-                return true;
-
-            case R.id.menu_main_send_activation_mail:
-                doSendActivationMail();
-                return true;
-
-            case R.id.menu_main_send_reset_password_mail:
-                doSendResetPasswordMail();
-                return true;
 
 
             default:
@@ -169,6 +150,65 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doDeleteTestUser() {
+        FirebaseUser user;
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            Toast.makeText( getApplicationContext(), "Deletion not possible (No user signed in).", Toast.LENGTH_LONG).show();
+        }
+        else {
+
+            // Reauthenticate
+            String email = TEST_MAIL;
+            String password = TEST_PASSWORD;
+
+            AuthCredential credential = EmailAuthProvider.getCredential( email, password);
+            user.reauthenticate( credential )
+                    .addOnCompleteListener(
+                            this,
+                            new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        //Erfolgsfall
+                                        Toast.makeText( getApplicationContext(), "Reauth is fine.", Toast.LENGTH_LONG).show();
+                                        finalDeletion();
+                                    } else {
+                                        // Fehlerfall
+                                        Toast.makeText( getApplicationContext(), "Reauth failed", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "Reauth failed : " +  task.getException().getMessage());
+                                    }
+                                }
+                            }
+                    );
+        }
+    }
+
+    private void finalDeletion(){
+
+        FirebaseUser user;
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            Log.e(TAG, "Serious error: Null user in final Deletion");
+        } else {
+            user.delete()
+                    .addOnCompleteListener(
+                            this,
+                            new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        //Erfolgsfall
+                                        Toast.makeText(getApplicationContext(), "Account deleted.", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        // Fehlerfall
+                                        Toast.makeText(getApplicationContext(), "Deletion failed", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "Delete Account Error :" + task.getException().getMessage());
+                                    }
+                                }
+                            }
+                    );
+        }
+
     }
 
     private void doTestAuthStatus() {
@@ -228,9 +268,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doSendActivationMail() {
+        FirebaseUser user;
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            Toast.makeText( getApplicationContext(), "Sending not possible (No user signed in).", Toast.LENGTH_LONG).show();
+        }
+        else {
+            user.sendEmailVerification()
+                .addOnCompleteListener(
+                        this,
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    //Erfolgsfall
+                                    Toast.makeText( getApplicationContext(), "Ver. Mail sent.", Toast.LENGTH_LONG).show();
+                                } else {
+                                    // Fehlerfall
+                                    Toast.makeText( getApplicationContext(), "Sending Verif. Mail Failed", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, "Sending verification mail failed : " +  task.getException().getMessage());
+                                }
+                            }
+                        }
+                );
+        }
     }
 
     private void doSendResetPasswordMail() {
+        // TODO: Check E-Mail...
+        FirebaseAuth.getInstance().sendPasswordResetEmail( TEST_MAIL )
+                .addOnCompleteListener(
+                    this,
+                    new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                //Erfolgsfall
+                                Toast.makeText( getApplicationContext(), "PW-Reset Mail sent.", Toast.LENGTH_LONG).show();
+                            } else {
+                                // Fehlerfall
+                                Toast.makeText( getApplicationContext(), "Sending PW-Reset Mail Failed", Toast.LENGTH_LONG).show();
+                                Log.d(TAG, "Sending password reset mail failed : " +  task.getException().getMessage());
+                            }
+                        }
+                    }
+            );
     }
 
 
@@ -264,6 +346,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG,"called onDestroy");
     }
-
 
 }

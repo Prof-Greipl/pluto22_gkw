@@ -1,13 +1,21 @@
 package de.hawlandshut.pluto22_gwk;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -37,6 +45,18 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mButtonSignIn.setOnClickListener( this );
         mButtonCreateAccount.setOnClickListener( this );
         mButtonResetPassword.setOnClickListener( this );
+
+        // TODO: Presets only for testing - remove later
+        mEditTextEmail.setText("dietergreipl@gmail.com");
+        mEditTextPassword.setText("123456");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null)
+            finish(); // In diesem Fall kommen wir von CreateAccount!
     }
 
     @Override
@@ -45,7 +65,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         int i = v.getId();
         switch(i){
             case R.id.signInButtonCreateAccount:
-                doCreateAccount();
+                doGotoCreateAccount();
                 return;
                 
             case R.id.signInButtonSignIn:
@@ -61,14 +81,62 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     // Business Logic
     private void doSignIn() {
-        Toast.makeText( getApplicationContext(), "Clicked SignIn", Toast.LENGTH_LONG).show();
+        String email = mEditTextEmail.getText().toString();
+        String password = mEditTextPassword.getText().toString();
+
+        // TODO (S5-HW): Check Email, Check Password
+
+        // Check, if any user is signed in. If yes, go home...
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null){
+            Toast.makeText( getApplicationContext(), "Please sign out first.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword( email, password)
+                .addOnCompleteListener(
+                        this,
+                        new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()){
+                                    //Erfolgsfall
+                                    Toast.makeText( getApplicationContext(), "You are signed in.", Toast.LENGTH_LONG).show();
+                                    finish();
+                                } else {
+                                    // Fehlerfall
+                                    Toast.makeText( getApplicationContext(), "Sign in failed", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, "Create Account Error :" +  task.getException().getMessage());
+                                }
+                            }
+                        }
+                );
     }
 
     private void doResetPassword() {
-        Toast.makeText( getApplicationContext(), "Clicked ResetPassword", Toast.LENGTH_LONG).show();
+        String email = mEditTextEmail.getText().toString();
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail( email )
+                .addOnCompleteListener(
+                        this,
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    //Erfolgsfall
+                                    Toast.makeText( getApplicationContext(), "PW-Reset Mail sent.", Toast.LENGTH_LONG).show();
+                                } else {
+                                    // Fehlerfall
+                                    Toast.makeText( getApplicationContext(), "Sending PW-Reset Mail Failed", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, "Sending password reset mail failed : " +  task.getException().getMessage());
+                                }
+                            }
+                        }
+                );
     }
 
-    private void doCreateAccount() {
-        Toast.makeText( getApplicationContext(), "Clicked CreateAccount", Toast.LENGTH_LONG).show();
+    private void doGotoCreateAccount() {
+        Intent intent = new Intent( getApplication(), CreateAccountActivity.class);
+        startActivity( intent );
     }
 }

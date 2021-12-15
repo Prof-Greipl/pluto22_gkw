@@ -3,31 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_main_create_test_user"
-        android:title= "Create Testuser" />
+        android:id="@+id/menu_main_manage_account"
+        android:title= "Manage Account" />
 
     <item
-        android:id="@+id/menu_main_delete_test_user"
-        android:title= "Delete Testuser" />
-
-    <item
-        android:id="@+id/menu_main_test_auth_status"
-        android:title= "Test Auth Status" />
-
-    <item
-        android:id="@+id/menu_main_sign_in"
-        android:title= "Sign In Testuser" />
-
-    <item
-        android:id="@+id/menu_main_sign_out"
-        android:title= "Sign Out Testuser" />
-
-    <item
-        android:id="@+id/menu_main_send_activation_mail"
-        android:title= "Send Activation Mail" />
-
-    <item
-        android:id="@+id/menu_main_send_reset_password_mail"
-        android:title= "Send Reset Password Mail" />
+        android:id="@+id/menu_main_test_write"
+        android:title= "Test Write" />
 
 </menu>
