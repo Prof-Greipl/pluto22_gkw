@@ -8,6 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class PostActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final String TAG = "xxPostActivity";
@@ -24,9 +32,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         mButtonPost = findViewById( R.id.postButtonPost);
         mEditTextText = findViewById( R.id.postEditTextText);
         mEditTextTitle = findViewById( R.id.postEditTextTitle);
-
         mButtonPost.setOnClickListener( this );
-
     }
 
     @Override
@@ -40,6 +46,17 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void doPost() {
-        Toast.makeText(getApplication(), "pressed Post", Toast.LENGTH_LONG).show();
+
+        // TODO: Add checkings before posting
+        Map<String, Object> postMap = new HashMap<>();
+        postMap.put("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        postMap.put("author", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        postMap.put("title", mEditTextTitle.getText().toString());
+        postMap.put("body", mEditTextText.getText().toString());
+        postMap.put("timestamp", ServerValue.TIMESTAMP);
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Posts/");
+        mDatabase.push().setValue(postMap);
+
     }
 }

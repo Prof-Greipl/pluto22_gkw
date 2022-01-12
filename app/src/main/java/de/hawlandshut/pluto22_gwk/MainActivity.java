@@ -4,6 +4,7 @@ package de.hawlandshut.pluto22_gwk;
 import static android.widget.Toast.*;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,8 +29,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
@@ -44,24 +49,28 @@ public class MainActivity extends AppCompatActivity {
     static final String TAG = "xx MainActivity";
 
     ListView mListView;
-    ArrayList<Post> mPostList; // Diese Liste wird später die Posts enthalten, die anzeigen wollen.
+    ArrayList<Post> mPostList = new ArrayList<Post>(); // Diese Liste wird später die Posts enthalten, die anzeigen wollen.
     ArrayAdapter<Post> mAdapter;
+
+    ChildEventListener mCEL;
+    Query mQuery;
+    boolean mListenerIsRunning = false;
 
     // TODO: remove - only for testing
     private final static String TEST_MAIL = "dietergreipl@gmail.com";
     private final static String TEST_PASSWORD = "123456";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+    //    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
+
         // TODO: just for testing, remove later
         Log.d(TAG, "called onCreate");
-
-        // TODO: Only for testing
-        PostTestData.createTestData();
-        mPostList = (ArrayList<Post>) PostTestData.postTestList;
 
         // Adapter initialiseren und implementieren
         mAdapter = new ArrayAdapter<Post>(
@@ -80,10 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Post post = getItem(position);
 
-                text1.setText( post.author);
+                text1.setText( post.title+" ("+post.author+")" );
                 text2.setText( post.body);
-
-                Log.d(TAG, "Called with position : " + position);
 
                 return view;
             }
@@ -92,6 +99,13 @@ public class MainActivity extends AppCompatActivity {
 
         mListView = findViewById( R.id.mainListViewMessages );
         mListView.setAdapter( mAdapter );
+
+        // CEL erzeugen...
+        mCEL = getChildEventListener();
+
+        //Listner auf einem Knoten aktivieren
+        mQuery = FirebaseDatabase.getInstance().getReference("Posts/").limitToLast( 3 );
+
     }
 
     @Override
@@ -101,11 +115,26 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user;
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null){
-            // Kein User angemeldet
-            // Toast.makeText( getApplicationContext(), "Kein User angemeldet. Gehe zu SignIn!", Toast.LENGTH_LONG).show();
+            resetApp();
             Intent intent = new Intent( getApplication(), SignInActivity.class);
             startActivity( intent );
+        } else {
+            if (!mListenerIsRunning){
+                mPostList.clear();
+                mQuery.addChildEventListener( mCEL );
+                mListenerIsRunning = true;
+                mAdapter.notifyDataSetChanged();
+            }
         }
+    }
+
+    private void resetApp() {
+        if (mListenerIsRunning){
+            mQuery.removeEventListener( mCEL );
+            mListenerIsRunning = false;
+        }
+        mPostList.clear();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -117,11 +146,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
         switch ( item.getItemId()) {
             case R.id.menu_main_manage_account:
-                Intent intent = new Intent( getApplication(), ManageAccountActivity.class);
+
+                intent = new Intent( getApplication(), ManageAccountActivity.class);
                 startActivity( intent );
                 return true;
+
+            case R.id.menu_main_goto_post:
+                intent = new Intent( getApplication(), PostActivity.class);
+                startActivity( intent );
+                return true;
+
 
             case R.id.menu_main_test_write:
                 DatabaseReference db = FirebaseDatabase.getInstance().getReference("Posts/");
@@ -161,6 +198,45 @@ public class MainActivity extends AppCompatActivity {
                         });
     }
 
+    private ChildEventListener getChildEventListener(){
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d(TAG, "CEL: onChildAdded, Key = " + snapshot.getKey()+" Title :" + snapshot.child("title").getValue());
+                Post p = Post.fromSnapShot( snapshot );
+                mPostList.add( p );
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                Log.d(TAG, "CEL: onChildRemoved, Key = " + snapshot.getKey());
+                String key = snapshot.getKey();
+                for( int i = 0; i < mPostList.size(); i++){
+                    if (key.equals( mPostList.get(i).firebaseKey)){
+                        mPostList.remove( i );
+                        break;
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d(TAG, "CEL: onChildMoved, Key = " + snapshot.getKey());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d(TAG, "CEL: onCancelled.");
+                mListenerIsRunning = false;
+            }
+        };
+    }
 
     // TODO: remove, if not needed.
     @Override

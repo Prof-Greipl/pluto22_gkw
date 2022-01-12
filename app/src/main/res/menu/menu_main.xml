@@ -7,6 +7,10 @@
         android:title= "Manage Account" />
 
     <item
+        android:id="@+id/menu_main_goto_post"
+        android:title= "Post" />
+
+    <item
         android:id="@+id/menu_main_test_write"
         android:title= "Test Write" />
 
