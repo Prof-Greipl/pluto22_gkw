@@ -46,17 +46,13 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void doPost() {
-
-        // TODO: Add checkings before posting
         Map<String, Object> postMap = new HashMap<>();
         postMap.put("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
         postMap.put("author", FirebaseAuth.getInstance().getCurrentUser().getEmail());
         postMap.put("title", mEditTextTitle.getText().toString());
         postMap.put("body", mEditTextText.getText().toString());
         postMap.put("timestamp", ServerValue.TIMESTAMP);
-
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Posts/");
         mDatabase.push().setValue(postMap);
-
     }
 }
