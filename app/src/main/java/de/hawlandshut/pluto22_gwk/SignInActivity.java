@@ -45,10 +45,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mButtonSignIn.setOnClickListener( this );
         mButtonCreateAccount.setOnClickListener( this );
         mButtonResetPassword.setOnClickListener( this );
-
-        // TODO: Presets only for testing - remove later
-        mEditTextEmail.setText("dietergreipl@gmail.com");
-        mEditTextPassword.setText("123456");
     }
 
     @Override
@@ -56,12 +52,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null)
-            finish(); // In diesem Fall kommen wir von CreateAccount!
+            finish();
     }
 
     @Override
     public void onClick(View v) {
-        Log.d(TAG, "ID = " + v.getId());
         int i = v.getId();
         switch(i){
             case R.id.signInButtonCreateAccount:
