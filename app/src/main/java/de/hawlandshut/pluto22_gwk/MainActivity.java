@@ -56,11 +56,6 @@ public class MainActivity extends AppCompatActivity {
     Query mQuery;
     boolean mListenerIsRunning = false;
 
-    // TODO: remove - only for testing
-    private final static String TEST_MAIL = "dietergreipl@gmail.com";
-    private final static String TEST_PASSWORD = "123456";
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,27 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void doCreateTestUser() {
-        String email = TEST_MAIL;
-        String password = TEST_PASSWORD;
 
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        this,
-                        new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()){
-                                    //Erfolgsfall
-                                    Toast.makeText( getApplicationContext(), "Created User", Toast.LENGTH_LONG).show();
-                                } else {
-                                    // Fehlerfall
-                                    Toast.makeText( getApplicationContext(), "User Creation Failed", Toast.LENGTH_LONG).show();
-                                    Log.d(TAG, "Create Account Error :" +  task.getException().getMessage());
-                                }
-                            }
-                        });
-    }
 
     private ChildEventListener getChildEventListener(){
         return new ChildEventListener() {
