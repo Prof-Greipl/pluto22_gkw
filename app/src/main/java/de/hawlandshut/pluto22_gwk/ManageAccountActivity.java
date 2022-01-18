@@ -49,11 +49,6 @@ public class ManageAccountActivity extends AppCompatActivity implements View.OnC
         mButtonDeleteAccount.setOnClickListener( this );
         mButtonSendActivationMail.setOnClickListener( this );
         mButtonSignOut.setOnClickListener( this );
-
-        // TODO: Presets for testing. Remove later.
-        mEditTextPassword.setText("123456");
-
-
     }
 
     @Override
@@ -95,7 +90,6 @@ public class ManageAccountActivity extends AppCompatActivity implements View.OnC
             // Reauthenticate
             String email = user.getEmail();
             String password = mEditTextPassword.getText().toString();
-
             AuthCredential credential = EmailAuthProvider.getCredential( email, password);
             user.reauthenticate( credential )
                     .addOnCompleteListener(
@@ -116,11 +110,9 @@ public class ManageAccountActivity extends AppCompatActivity implements View.OnC
                             }
                     );
         }
-
     }
 
     private void finalDeletion(){
-
         FirebaseUser user;
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null){
@@ -145,7 +137,6 @@ public class ManageAccountActivity extends AppCompatActivity implements View.OnC
                             }
                     );
         }
-
     }
 
 
