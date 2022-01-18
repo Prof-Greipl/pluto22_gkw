@@ -34,13 +34,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         mEditTextPassword = findViewById( R.id.createAccountEditTextPassword);
         mEditTextPassword1 = findViewById( R.id.createAccountEditTextPassword1);
         mButtonCreateAccount = findViewById( R.id.createAccountButtonCreateAccount );
-
         mButtonCreateAccount.setOnClickListener( this );
-
-        // TODO: Presets for testing. Remove later.
-        mEditTextEmail.setText("dietergreipl@gmail.com");
-        mEditTextPassword.setText("123456");
-        mEditTextPassword1.setText("123456");
     }
 
 
@@ -57,8 +51,12 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
     private void doCreateAccount() {
         String email = mEditTextEmail.getText().toString();
         String password = mEditTextPassword.getText().toString();
+        String password1 = mEditTextPassword1.getText().toString();
 
-        // TODO: Verify equality of password and password1
+        if (!password.equals(password1)){
+            Toast.makeText( getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(
