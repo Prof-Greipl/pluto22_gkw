@@ -79,9 +79,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         String email = mEditTextEmail.getText().toString();
         String password = mEditTextPassword.getText().toString();
 
-        // TODO (S5-HW): Check Email, Check Password
-
-        // Check, if any user is signed in. If yes, go home...
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null){
             Toast.makeText( getApplicationContext(), "Please sign out first.", Toast.LENGTH_LONG).show();
