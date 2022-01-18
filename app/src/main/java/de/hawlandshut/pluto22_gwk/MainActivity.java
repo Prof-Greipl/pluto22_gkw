@@ -155,16 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
 
-            case R.id.menu_main_test_write:
-                DatabaseReference db = FirebaseDatabase.getInstance().getReference("Posts/");
-
-                Map<String, Object> test = new HashMap<>();
-                test.put("uid", "test_uid");
-                test.put("name", "Hans Huber");
-                test.put("matnr", "123456");
-                test.put("timestamp", ServerValue.TIMESTAMP);
-                db.push().setValue( test );
-
             default:
                 return true;
         }
