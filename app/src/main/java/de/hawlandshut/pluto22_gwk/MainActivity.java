@@ -61,13 +61,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    //    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
 
-        // TODO: just for testing, remove later
-        Log.d(TAG, "called onCreate");
-
-        // Adapter initialiseren und implementieren
         mAdapter = new ArrayAdapter<Post>(
                 this,
                 android.R.layout.simple_list_item_2,
@@ -77,16 +73,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-
                 TextView text1, text2;
                 text1 = view.findViewById( android.R.id.text1);
                 text2 = view.findViewById( android.R.id.text2);
-
                 Post post = getItem(position);
-
                 text1.setText( post.title+" ("+post.author+")" );
                 text2.setText( post.body);
-
                 return view;
             }
         };
@@ -95,12 +87,8 @@ public class MainActivity extends AppCompatActivity {
         mListView = findViewById( R.id.mainListViewMessages );
         mListView.setAdapter( mAdapter );
 
-        // CEL erzeugen...
         mCEL = getChildEventListener();
-
-        //Listner auf einem Knoten aktivieren
         mQuery = FirebaseDatabase.getInstance().getReference("Posts/").limitToLast( 3 );
-
     }
 
     @Override
@@ -144,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent;
         switch ( item.getItemId()) {
             case R.id.menu_main_manage_account:
-
                 intent = new Intent( getApplication(), ManageAccountActivity.class);
                 startActivity( intent );
                 return true;
@@ -153,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 intent = new Intent( getApplication(), PostActivity.class);
                 startActivity( intent );
                 return true;
-
 
             default:
                 return true;
@@ -167,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d(TAG, "CEL: onChildAdded, Key = " + snapshot.getKey()+" Title :" + snapshot.child("title").getValue());
                 Post p = Post.fromSnapShot( snapshot );
                 mPostList.add( p );
                 mAdapter.notifyDataSetChanged();
@@ -179,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "CEL: onChildRemoved, Key = " + snapshot.getKey());
                 String key = snapshot.getKey();
                 for( int i = 0; i < mPostList.size(); i++){
                     if (key.equals( mPostList.get(i).firebaseKey)){
@@ -192,12 +176,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d(TAG, "CEL: onChildMoved, Key = " + snapshot.getKey());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d(TAG, "CEL: onCancelled.");
                 mListenerIsRunning = false;
             }
         };
@@ -207,31 +189,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG,"called onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG,"called onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG,"called onStop");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.d(TAG,"called onRestart");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG,"called onDestroy");
     }
 
 }
